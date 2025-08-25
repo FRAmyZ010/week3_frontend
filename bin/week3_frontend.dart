@@ -58,17 +58,36 @@ void main() async {
         case '3':
 
           // ========== Search expenses feature
+          case '3':
+  // ===== Search Expenses =====
+  stdout.write('Item to search: ');
+  String? searchItem = stdin.readLineSync();
 
-          
+  if (searchItem != null && searchItem.isNotEmpty) {
+    final searchUrl = Uri.parse(
+      'http://localhost:3000/expense/search/$userID?keyword=${Uri.encodeComponent(searchItem)}'
+    );
 
-          stdout.write('Item to search: ');
-          String? searchItem = stdin.readLineSync();
+    final searchResponse = await http.get(searchUrl);
 
-          if (searchItem != null && searchItem.isNotEmpty) {
-            // Write your code here
-          }
+    if (searchResponse.statusCode == 200) {
+      List results = jsonDecode(searchResponse.body);
 
-          break;
+      if (results.isEmpty) {
+        print('No results found.');
+      } else {
+        print('===== Search Results =====');
+        for (var e in results) {
+          print("ID: ${e['id']}, Item: ${e['item']}, Paid: ${e['paid']}, Date: ${e['date']}");
+        }
+      }
+    } else {
+      print('Search failed: ${searchResponse.statusCode}');
+    }
+  } else {
+    print('Search keyword is empty.');
+  }
+  break;
 
         case '4':
 
