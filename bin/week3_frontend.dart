@@ -57,37 +57,44 @@ void main() async {
 
         case '3':
 
-          // ========== Search expenses feature
-          case '3':
-  // ===== Search Expenses =====
-  stdout.write('Item to search: ');
-  String? searchItem = stdin.readLineSync();
+        // ========== Search expenses feature
+        case '3':
+          // ===== Search Expenses =====
+          stdout.write('Item to search: ');
+          String? searchItem = stdin.readLineSync();
 
-  if (searchItem != null && searchItem.isNotEmpty) {
-    final searchUrl = Uri.parse(
-      'http://localhost:3000/expense/search/$userID?keyword=${Uri.encodeComponent(searchItem)}'
-    );
+          if (searchItem != null && searchItem.isNotEmpty) {
+            final searchUrl = Uri.parse(
+              'http://localhost:3000/expense/search/$userID?keyword=${Uri.encodeComponent(searchItem)}',
+            );
 
-    final searchResponse = await http.get(searchUrl);
+            final searchResponse = await http.get(searchUrl);
 
-    if (searchResponse.statusCode == 200) {
-      List results = jsonDecode(searchResponse.body);
+            if (searchResponse.statusCode == 200) {
+              List results = jsonDecode(searchResponse.body);
 
-      if (results.isEmpty) {
-        print('No results found.');
-      } else {
-        print('===== Search Results =====');
-        for (var e in results) {
-          print("ID: ${e['id']}, Item: ${e['item']}, Paid: ${e['paid']}, Date: ${e['date']}");
-        }
-      }
-    } else {
-      print('Search failed: ${searchResponse.statusCode}');
-    }
-  } else {
-    print('Search keyword is empty.');
-  }
-  break;
+              if (results.isEmpty) {
+                print('No results found.');
+              } else {
+                print('===== Search Results =====');
+                int price = 0;
+
+                for (var e in results) {
+                  price = price + e['paid'] as int;
+                  print(
+                    " ${e['id']}.  ${e['item']}: ${e['paid']}฿ : ${e['date']}",
+                  );
+                  
+                }
+                print("Total expenses = $price฿");
+              }
+            } else {
+              print('Search failed: ${searchResponse.statusCode}');
+            }
+          } else {
+            print('Search keyword is empty.');
+          }
+          break;
 
         case '4':
 
@@ -100,7 +107,6 @@ void main() async {
           String? paid = stdin.readLineSync();
 
           // Write your code here
-
 
           break;
 
