@@ -81,7 +81,36 @@ void main() async {
           String? paid = stdin.readLineSync();
 
           // Write your code here
+         if (item == null || item.trim().isEmpty || paid == null || paid.trim().isEmpty) {
+    print('Item and Paid cannot be empty.');
+    break;
+  }
 
+  final paidNum = num.tryParse(paid);
+  if (paidNum == null) {
+    print('Paid must be a number.');
+    break;
+  }
+
+  try {
+    final addUrl = Uri.parse('http://localhost:3000/add-expenses');
+    final addBody = {
+      'item': item.trim(),
+      'paid': paidNum.toString(),
+      'user_id': userID.toString(), 
+    };
+
+    final addRes = await http.post(addUrl, body: addBody);
+
+    if (addRes.statusCode == 201) {
+      final data = jsonDecode(addRes.body);
+      print('${data['message']} (id: ${data['expense_id']})');
+    } else {
+      print('Failed to add expense [${addRes.statusCode}] -> ${addRes.body}');
+    }
+  } catch (e) {
+    print('Connection error: $e');
+  }
 
           break;
 
@@ -94,7 +123,7 @@ void main() async {
           int? itemID = int.tryParse(stdin.readLineSync() ?? '');
 
           // Write your code here
-
+         
           break;
 
         case '6':
