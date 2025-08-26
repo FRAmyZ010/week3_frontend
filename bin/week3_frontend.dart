@@ -55,19 +55,42 @@ void main() async {
 
           break;
 
+        // ========== Search expenses feature
         case '3':
-
-          // ========== Search expenses feature
-
-          
-
+          // ===== Search Expenses =====
           stdout.write('Item to search: ');
           String? searchItem = stdin.readLineSync();
 
           if (searchItem != null && searchItem.isNotEmpty) {
-            // Write your code here
-          }
+            final searchUrl = Uri.parse(
+              'http://localhost:3000/expense/search/$userID?keyword=${Uri.encodeComponent(searchItem)}',
+            );
 
+            final searchResponse = await http.get(searchUrl);
+
+            if (searchResponse.statusCode == 200) {
+              List results = jsonDecode(searchResponse.body);
+
+              if (results.isEmpty) {
+                print('No results found.');
+              } else {
+                print('===== Search Results =====');
+                int price = 0;
+
+                for (var e in results) {
+                  price = price + e['paid'] as int;
+                  print(
+                    " ${e['id']}.  ${e['item']}: ${e['paid']}฿ : ${e['date']}",
+                  );
+                }
+                print("Total expenses = $price฿");
+              }
+            } else {
+              print('Search failed: ${searchResponse.statusCode}');
+            }
+          } else {
+            print('Search keyword is empty.');
+          }
           break;
 
 case '4':
@@ -89,6 +112,7 @@ case '4':
     break;
   }
 
+
   try {
     final addUrl = Uri.parse('http://localhost:3000/add-expenses');
     final addBody = jsonEncode({
@@ -105,7 +129,7 @@ case '4':
 
     if (addRes.statusCode == 201) {
       final data = jsonDecode(addRes.body);
-      print('${data['message']} (id: ${data['expense_id']})');
+      print('${data['message']}');
     } else {
       print('Failed to add expense [${addRes.statusCode}] -> ${addRes.body}');
     }
@@ -113,7 +137,6 @@ case '4':
     print('Connection error: $e');
   }
   break;
-
 
         case '5':
 
@@ -124,7 +147,30 @@ case '4':
           int? itemID = int.tryParse(stdin.readLineSync() ?? '');
 
           // Write your code here
-         
+          if (itemID == null) {
+            print('Please enter a valid ID.');
+            break;
+          }
+
+          try {
+            final delUrl = Uri.parse(
+              'http://localhost:3000/del-expenses/$itemID',
+            );
+            final delRes = await http.delete(delUrl);
+
+            if (delRes.statusCode == 200) {
+              final data = jsonDecode(delRes.body);
+              print(data['message']);
+            } else if (delRes.statusCode == 404) {
+              print('Expense not found.');
+            } else {
+              print(
+                'Failed to delete expense [${delRes.statusCode}] -> ${delRes.body}',
+              );
+            }
+          } catch (e) {
+            print('Connection error: $e');
+          }
           break;
 
         case '6':
