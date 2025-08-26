@@ -42,24 +42,72 @@ void main() async {
         case '1':
 
           // ========== All expenses feature
-
-          // Write your code here
+          try {
+            final u = Uri.parse('http://localhost:3000/expenses/$userID');
+            final r = await http.get(u);
+            if (r.statusCode == 200) {
+              final data = jsonDecode(r.body);
+              if (data is List) {
+                if (data.isEmpty) {
+                  print('(no expenses)');
+                } else {
+                  for (final e in data) {
+                    final m = (e as Map<String, dynamic>);
+                    final id = (m['id'] ?? '').toString();
+                    final item = (m['item'] ?? '').toString();
+                    final paid = (m['paid'] ?? '').toString();
+                    final date = (m['date'] ?? '').toString();
+                    print('[#${id}] $item  paid=$paid  date=$date');
+                  }
+                }
+              } else {
+                print(data);
+              }
+            } else {
+              print('Failed: ${r.statusCode} ${r.body}');
+            }
+          } catch (e) {
+            print('Error: $e');
+          }
 
           break;
 
         case '2':
 
           // ========== Today's expenses feature
-
-          // Write your code here
+          try {
+            final u = Uri.parse('http://localhost:3000/expenses/today/$userID');
+            final r = await http.get(u);
+            if (r.statusCode == 200) {
+              final data = jsonDecode(r.body);
+              if (data is List) {
+                if (data.isEmpty) {
+                  print('(no expenses today)');
+                } else {
+                  for (final e in data) {
+                    final m = (e as Map<String, dynamic>);
+                    final id = (m['id'] ?? '').toString();
+                    final item = (m['item'] ?? '').toString();
+                    final paid = (m['paid'] ?? '').toString();
+                    final date = (m['date'] ?? '').toString();
+                    print('[#${id}] $item  paid=$paid  date=$date');
+                  }
+                }
+              } else {
+                print(data);
+              }
+            } else {
+              print('Failed: ${r.statusCode} ${r.body}');
+            }
+          } catch (e) {
+            print('Error: $e');
+          }
 
           break;
 
         case '3':
 
           // ========== Search expenses feature
-
-          
 
           stdout.write('Item to search: ');
           String? searchItem = stdin.readLineSync();
@@ -81,7 +129,6 @@ void main() async {
           String? paid = stdin.readLineSync();
 
           // Write your code here
-
 
           break;
 
