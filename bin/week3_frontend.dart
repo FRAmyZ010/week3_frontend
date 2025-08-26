@@ -55,8 +55,6 @@ void main() async {
 
           break;
 
-        case '3':
-
         // ========== Search expenses feature
         case '3':
           // ===== Search Expenses =====
@@ -95,19 +93,50 @@ void main() async {
           }
           break;
 
-        case '4':
+case '4':
+  // ========== Add expense feature
+  print('===== Add New Expense =====');
+  stdout.write('Item: ');
+  String? item = stdin.readLineSync();
+  stdout.write('Paid: ');
+  String? paid = stdin.readLineSync();
 
-          // ========== Add expense feature
+  if (item == null || item.trim().isEmpty || paid == null || paid.trim().isEmpty) {
+    print('Item and Paid cannot be empty.');
+    break;
+  }
 
-          print('===== Add new item =====');
-          stdout.write('Item: ');
-          String? item = stdin.readLineSync();
-          stdout.write('Paid: ');
-          String? paid = stdin.readLineSync();
+  final paidNum = int.tryParse(paid);
+  if (paidNum == null) {
+    print('Paid must be a number.');
+    break;
+  }
 
-          // Write your code here
 
-          break;
+  try {
+    final addUrl = Uri.parse('http://localhost:3000/add-expenses');
+    final addBody = jsonEncode({
+      'item': item.trim(),
+      'paid': paidNum,     
+      'user_id': userID,   
+    });
+
+    final addRes = await http.post(
+      addUrl,
+      headers: {"Content-Type": "application/json"},
+      body: addBody,
+    );
+
+    if (addRes.statusCode == 201) {
+      final data = jsonDecode(addRes.body);
+      print('${data['message']}');
+    } else {
+      print('Failed to add expense [${addRes.statusCode}] -> ${addRes.body}');
+    }
+  } catch (e) {
+    print('Connection error: $e');
+  }
+  break;
 
         case '5':
 
