@@ -84,7 +84,6 @@ void main() async {
                   print(
                     " ${e['id']}.  ${e['item']}: ${e['paid']}฿ : ${e['date']}",
                   );
-                  
                 }
                 print("Total expenses = $price฿");
               }
@@ -119,26 +118,30 @@ void main() async {
           int? itemID = int.tryParse(stdin.readLineSync() ?? '');
 
           // Write your code here
-            if (itemID == null) {
-    print('Please enter a valid ID.');
-    break;
-  }
+          if (itemID == null) {
+            print('Please enter a valid ID.');
+            break;
+          }
 
-  try {
-    final delUrl = Uri.parse('http://localhost:3000/del-expenses/$itemID');
-    final delRes = await http.delete(delUrl);
+          try {
+            final delUrl = Uri.parse(
+              'http://localhost:3000/del-expenses/$itemID',
+            );
+            final delRes = await http.delete(delUrl);
 
-    if (delRes.statusCode == 200) {
-      final data = jsonDecode(delRes.body);
-      print(data['message']);
-    } else if (delRes.statusCode == 404) {
-      print('Expense not found.');
-    } else {
-      print('Failed to delete expense [${delRes.statusCode}] -> ${delRes.body}');
-    }
-  } catch (e) {
-    print('Connection error: $e');
-  }
+            if (delRes.statusCode == 200) {
+              final data = jsonDecode(delRes.body);
+              print(data['message']);
+            } else if (delRes.statusCode == 404) {
+              print('Expense not found.');
+            } else {
+              print(
+                'Failed to delete expense [${delRes.statusCode}] -> ${delRes.body}',
+              );
+            }
+          } catch (e) {
+            print('Connection error: $e');
+          }
           break;
 
         case '6':
