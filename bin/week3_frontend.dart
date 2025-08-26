@@ -70,23 +70,20 @@ void main() async {
 
           break;
 
-        case '4':
+case '4':
+  // ========== Add expense feature
+  print('===== Add New Expense =====');
+  stdout.write('Item: ');
+  String? item = stdin.readLineSync();
+  stdout.write('Paid: ');
+  String? paid = stdin.readLineSync();
 
-          // ========== Add expense feature
-
-          print('===== Add new item =====');
-          stdout.write('Item: ');
-          String? item = stdin.readLineSync();
-          stdout.write('Paid: ');
-          String? paid = stdin.readLineSync();
-
-          // Write your code here
-         if (item == null || item.trim().isEmpty || paid == null || paid.trim().isEmpty) {
+  if (item == null || item.trim().isEmpty || paid == null || paid.trim().isEmpty) {
     print('Item and Paid cannot be empty.');
     break;
   }
 
-  final paidNum = num.tryParse(paid);
+  final paidNum = int.tryParse(paid);
   if (paidNum == null) {
     print('Paid must be a number.');
     break;
@@ -94,13 +91,17 @@ void main() async {
 
   try {
     final addUrl = Uri.parse('http://localhost:3000/add-expenses');
-    final addBody = {
+    final addBody = jsonEncode({
       'item': item.trim(),
-      'paid': paidNum.toString(),
-      'user_id': userID.toString(), 
-    };
+      'paid': paidNum,     
+      'user_id': userID,   
+    });
 
-    final addRes = await http.post(addUrl, body: addBody);
+    final addRes = await http.post(
+      addUrl,
+      headers: {"Content-Type": "application/json"},
+      body: addBody,
+    );
 
     if (addRes.statusCode == 201) {
       final data = jsonDecode(addRes.body);
@@ -111,8 +112,8 @@ void main() async {
   } catch (e) {
     print('Connection error: $e');
   }
+  break;
 
-          break;
 
         case '5':
 
