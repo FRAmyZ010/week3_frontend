@@ -45,22 +45,36 @@ void main() async {
           try {
             final u = Uri.parse('http://localhost:3000/expenses/$userID');
             final r = await http.get(u);
+
             if (r.statusCode == 200) {
               final data = jsonDecode(r.body);
+
+              // helper for padding + time format: YYYY-MM-DD HH:MM:SS.mmm
+              String two(int n) => n.toString().padLeft(2, '0');
+              String fmt(DateTime dt) =>
+                  "${dt.year}-${two(dt.month)}-${two(dt.day)} "
+                  "${two(dt.hour)}:${two(dt.minute)}:${two(dt.second)}."
+                  "${dt.millisecond.toString().padLeft(3, '0')}";
+
               if (data is List) {
+                print("------------- All expenses ----------");
                 if (data.isEmpty) {
-                  print('(no expenses)');
+                  print("Total expenses = 0฿");
                 } else {
+                  int total = 0;
                   for (final e in data) {
                     final m = (e as Map<String, dynamic>);
-                    final id = (m['id'] ?? '').toString();
-                    final item = (m['item'] ?? '').toString();
-                    final paid = (m['paid'] ?? '').toString();
-                    final date = (m['date'] ?? '').toString();
-                    print('[#${id}] $item  paid=$paid  date=$date');
+                    final id = m['id'] ?? '';
+                    final item = m['item'] ?? '';
+                    final paid = (m['paid'] as num?)?.toInt() ?? 0;
+                    final dt = DateTime.parse(m['date'].toString()).toLocal();
+                    print("$id. $item : ${paid}฿ : ${fmt(dt)}");
+                    total += paid;
                   }
+                  print("Total expenses = ${total}฿");
                 }
               } else {
+                // unexpected structure
                 print(data);
               }
             } else {
@@ -69,7 +83,6 @@ void main() async {
           } catch (e) {
             print('Error: $e');
           }
-
           break;
 
         case '2':
@@ -78,20 +91,33 @@ void main() async {
           try {
             final u = Uri.parse('http://localhost:3000/expenses/today/$userID');
             final r = await http.get(u);
+
             if (r.statusCode == 200) {
               final data = jsonDecode(r.body);
+
+              // helper for padding + time format: YYYY-MM-DD HH:MM:SS.mmm
+              String two(int n) => n.toString().padLeft(2, '0');
+              String fmt(DateTime dt) =>
+                  "${dt.year}-${two(dt.month)}-${two(dt.day)} "
+                  "${two(dt.hour)}:${two(dt.minute)}:${two(dt.second)}."
+                  "${dt.millisecond.toString().padLeft(3, '0')}";
+
               if (data is List) {
+                print("------------- Today's expenses ----------");
                 if (data.isEmpty) {
-                  print('(no expenses today)');
+                  print("Total expenses = 0฿");
                 } else {
+                  int total = 0;
                   for (final e in data) {
                     final m = (e as Map<String, dynamic>);
-                    final id = (m['id'] ?? '').toString();
-                    final item = (m['item'] ?? '').toString();
-                    final paid = (m['paid'] ?? '').toString();
-                    final date = (m['date'] ?? '').toString();
-                    print('[#${id}] $item  paid=$paid  date=$date');
+                    final id = m['id'] ?? '';
+                    final item = m['item'] ?? '';
+                    final paid = (m['paid'] as num?)?.toInt() ?? 0;
+                    final dt = DateTime.parse(m['date'].toString()).toLocal();
+                    print("$id. $item : ${paid}฿ : ${fmt(dt)}");
+                    total += paid;
                   }
+                  print("Total expenses = ${total}฿");
                 }
               } else {
                 print(data);
@@ -102,7 +128,6 @@ void main() async {
           } catch (e) {
             print('Error: $e');
           }
-
           break;
 
         case '3':
