@@ -45,6 +45,26 @@ void main() async {
 
           // Write your code here
 
+          final expenseurl = Uri.parse('http://localhost:3000/expenses/$userID',);
+          final response = await http.get(expenseurl);
+
+          if(response.statusCode == 200){
+            final result = jsonDecode(response.body) as List;
+            int total = 0;
+
+            print("----------- All Expenses -----------");
+            for (Map exp in result){
+              
+              total += exp['paid'] as int;
+              print( 
+                "${exp['id']}. ${exp['item']} : ${exp['paid']}฿ : ${exp['date']}"
+              );
+            }
+            print("Total expenses = $total ฿");
+          }else{
+            print('Error ${response.statusCode}: ${response.body}');
+          }
+
           break;
 
         case '2':
@@ -52,6 +72,28 @@ void main() async {
           // ========== Today's expenses feature
 
           // Write your code here
+
+          final todayurl = Uri.parse( 
+            'http://localhost:3000/expenses/today/$userID',
+          );
+          final todayResponse = await http.get(todayurl);
+
+          if (todayResponse.statusCode == 200){
+            final result = jsonDecode(todayResponse.body) as List;
+            int total = 0;
+
+            print("-------------- Today's Expenses --------------");
+
+            for (Map exp in result){
+              total += exp['paid'] as int;
+              print(
+                "${exp['id']}. ${exp['item']} : ${exp['paid']}฿ : ${exp['date']}"
+              );
+            }
+            print("Total expenses = $total฿");
+          }else{
+            print('Error ${todayResponse.statusCode}: ${todayResponse.body}');
+          }
 
           break;
 
